@@ -7,7 +7,7 @@ description: >
   "what do people complain about", "why did X change", or has a survey export and a rough question. Also triggers on
   "run dig-for" or "/dig-for".
 argument-hint: "[question] [survey file]"
-allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py *), Bash(python ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py *)
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/ib.py *), Bash(python ${CLAUDE_SKILL_DIR}/scripts/ib.py *)
 metadata:
   version: "0.3.0"
 ---
@@ -22,9 +22,24 @@ evidence, then how sure we are.
 your own analysis scripts. Your job is to clarify the question, pick the
 comparison, code the relevant comments and write the narrative.
 
-`IB` below means `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py` (use `python`
-if `python3` is not found). Method details: `${CLAUDE_PLUGIN_ROOT}/docs/methods.md`.
-Narrative format: `${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`.
+## 0. Set up
+
+`IB` below means `python3 ${CLAUDE_SKILL_DIR}/scripts/ib.py` (use `python` if
+`python3` is not found). If that path does not exist (for example in Claude.ai
+chat, where it may stay a placeholder), the engine is in the `scripts/` folder
+next to this SKILL.md: find it with `find / -name ib.py -path "*dig-for*" 2>/dev/null | head -1`
+and use that path.
+
+The engine needs pandas, numpy, scipy, scikit-learn and openpyxl. If a command
+fails with a missing package, **ask the user before installing anything**, then
+run `pip install -r <scripts folder>/requirements.txt`.
+
+Save working files and the report where the user can open them: by default
+`./insight-badger/<file name>/` in the current folder; on Claude.ai, pass
+`--out` with the outputs folder the environment provides.
+
+Method details: [reference/methods.md](reference/methods.md).
+Narrative format: [reference/narrative.md](reference/narrative.md).
 
 ## 1. Profile
 
@@ -32,7 +47,6 @@ Narrative format: `${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`.
 IB profile "<survey file>" [--codebook "<codebook>"]
 ```
 
-If packages are missing: `pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt`.
 Note the KPI candidates, demographics, batteries and open-text questions. Fix
 wrong types with `--types types.json`.
 
@@ -74,7 +88,7 @@ groups need a caution.
 
 If comments help answer the question, read `insight-badger/<file>/texts.json`.
 Each answer carries the person's NPS group and compared-group values, so you
-can focus on the groups in question. Write `codes.json` (format in methods.md),
+can focus on the groups in question. Write `codes.json` (format in [reference/methods.md](reference/methods.md)),
 then:
 
 ```bash
@@ -84,7 +98,7 @@ IB themes --codes insight-badger/<file>/codes.json --results insight-badger/<fil
 ## 5. Write the narrative
 
 Write `insight-badger/<file>/narrative.json` following
-`${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`. For dig-for:
+[reference/narrative.md](reference/narrative.md). For dig-for:
 
 - **question**: the user's question, word for word; **scope**: 2–3 chips.
 - **title**: the answer, as a sentence.

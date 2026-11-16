@@ -1,6 +1,6 @@
 # Methods: what ib.py does, and how to explain it
 
-`scripts/ib.py` does every calculation. This page lists what it does so you
+`scripts/ib.py` (in this skill's folder) does every calculation. This page lists what it does so you
 can choose options, correct the profile, and explain results in plain words.
 
 ## Reading the file

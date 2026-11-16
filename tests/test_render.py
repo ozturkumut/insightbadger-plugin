@@ -10,7 +10,7 @@ from insight_badger.report.render import render_report
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIX = os.path.join(HERE, "fixtures")
-IB = os.path.join(HERE, "..", "scripts", "ib.py")
+IB = os.path.join(HERE, "..", "skills", "dig-deep", "scripts", "ib.py")
 
 
 def _coded(q_results):
@@ -34,6 +34,7 @@ def test_deep_report_renders_without_warnings(q_results):
         assert needle in html
     assert "example.com" not in html and "RecipientEmail" not in html
     assert "<script src" not in html  # no external scripts: works offline
+    assert "googleapis" not in html and "<link" not in html  # no external fonts or stylesheets
 
 
 def test_narrative_text_is_escaped(q_results):
@@ -82,3 +83,9 @@ def test_cli_end_to_end(tmp_path):
     assert rr.returncode == 0, rr.stderr
     out = [f for f in os.listdir(work) if f.endswith(".html")]
     assert out and os.path.getsize(work / out[0]) > 20000
+
+
+def test_engine_copies_in_sync():
+    tool = os.path.join(HERE, "..", "tools", "sync_engine.py")
+    res = subprocess.run([sys.executable, tool, "--check"], capture_output=True, text=True)
+    assert res.returncode == 0, res.stdout

@@ -6,8 +6,8 @@ the answer, chapter titles and text, persona names, actions and next
 questions. The renderer combines them, so **never type a number into the
 narrative that is not in the analyze/themes digest**.
 
-Worked examples: `tests/fixtures/narrative_deep.json` (dig-deep) and
-`tests/fixtures/narrative_for.json` (dig-for).
+Worked examples: [narrative_deep.json](narrative_deep.json) (dig-deep) and
+[narrative_for.json](narrative_for.json) (dig-for).
 
 ## Writing rules
 

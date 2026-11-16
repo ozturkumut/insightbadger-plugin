@@ -45,7 +45,8 @@ The **Download PDF** button at the top right offers two versions:
 - **Unbranded**: no logo or product name, ready to send as your own.
 
 Either version prints with a cover page, one chapter per page and page numbers. You can also ask for a PDF in chat
-("…and give me an unbranded PDF"); the skill saves it next to the report using Chrome, Edge or WeasyPrint.
+("…and give me an unbranded PDF"); the skill saves it next to the report using your local Chrome, Edge or
+WeasyPrint.
 
 ### Your own brand
 
@@ -80,38 +81,55 @@ colour, and the footer reads "Prepared by Acme Research".
   Claude in any language, with counts and sentiment computed by the engine.
 - **Privacy**: names, emails, phone numbers and IP addresses never appear in the report, and are removed from quotes.
 
-## Requirements
+## What this plugin runs and sends
 
-Python 3.9+ with `pandas`, `numpy`, `scipy`, `scikit-learn` and `openpyxl`:
+Insight Badger runs entirely on your computer (or in Claude's code sandbox on Claude.ai). It sends nothing anywhere.
 
-```bash
-pip install -r requirements.txt
-```
-
-Optional: `pyreadstat` for SPSS files, `weasyprint` for PDF export when no Chrome or Edge is installed.
+- **What it runs:** a Python script bundled with each skill (`skills/<skill>/scripts/ib.py`). It reads the survey
+  file you point it at and writes its working files and the report to `./insight-badger/<file name>/`, or to the
+  folder you name.
+- **Packages:** the script needs `pandas`, `numpy`, `scipy`, `scikit-learn` and `openpyxl`. If one is missing,
+  Claude asks before running `pip install`, which downloads them from the Python Package Index. Optional:
+  `pyreadstat` for SPSS files, `weasyprint` for PDFs.
+- **PDF export:** when you ask for a PDF in chat, the script opens your local Chrome, Chromium or Edge in headless
+  mode (or uses WeasyPrint) to print the report to a file. The Download PDF button in the report uses your
+  browser's own print window.
+- **Network:** none. The script makes no network requests, and reports use system fonts and inline charts, so
+  opening a report fetches nothing from the internet.
+- **Personal data:** columns such as names, emails, phone numbers and IP addresses are never shown in reports, and
+  emails, phone numbers, links and long ID numbers are removed from quotes. No raw data rows appear in reports.
+- **Credentials:** none are read or needed.
 
 ## How it works
 
-The skills drive a tested analysis engine in `scripts/`:
+Each skill drives a tested analysis engine in its own `scripts/` folder:
 
 ```bash
-python3 scripts/ib.py profile survey.csv          # question types, batteries, KPI and group candidates
-python3 scripts/ib.py analyze survey.csv --compare Q3
-python3 scripts/ib.py themes --codes codes.json   # after Claude codes the comments
-python3 scripts/ib.py render --narrative narrative.json [--pdf] [--brand none]
+python3 skills/dig-deep/scripts/ib.py profile survey.csv          # question types, batteries, KPI and group candidates
+python3 skills/dig-deep/scripts/ib.py analyze survey.csv --compare Q3
+python3 skills/dig-deep/scripts/ib.py themes --codes codes.json   # after Claude codes the comments
+python3 skills/dig-deep/scripts/ib.py render --narrative narrative.json [--pdf] [--brand none]
 ```
 
 The engine computes every number; Claude reviews the profile, codes the comments and writes the narrative
-(`docs/narrative.md`), so the words can never drift from the data. Methods are described in `docs/methods.md`.
+(`skills/dig-deep/reference/narrative.md`), so the words can never drift from the data. Methods are described in
+`skills/dig-deep/reference/methods.md`.
 
 ## Development
 
+The engine and reference docs live in `skills/dig-deep/`. Each skill carries its own copy because Claude.ai chat
+copies only a skill's own folder into its sandbox, so edit `skills/dig-deep/` only and sync:
+
 ```bash
-pip install -r requirements.txt pytest
+pip install -r skills/dig-deep/scripts/requirements.txt pytest
+python3 tools/sync_engine.py     # copy the engine and docs into dig-for (CI checks they match)
 python3 tests/make_fixtures.py   # synthetic Qualtrics, SurveyMonkey and Google Forms exports
 python3 -m pytest
-./tools/build.sh                 # builds dist/insight-badger.zip
+./tools/build.sh                 # checks versions and copies, builds dist/insight-badger.zip
 ```
+
+Release: raise `version` in `.claude-plugin/plugin.json`, both `SKILL.md` files and the engine's `__init__.py`
+(the build checks they match). Users only receive an update when the version changes.
 
 ## Licence
 

@@ -24,8 +24,10 @@
   --slate: #5A6E96;
   --slate-deep: #3F5178;
   --slate-pale: #E6EBF4;
-  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
-  --font-body: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
+  /* System fonts only: reports never fetch anything from the internet. */
+  --font-display: "Avenir Next", "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont,
+                  "Helvetica Neue", Roboto, Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -349,7 +351,7 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
 /* ── Print / PDF ── */
 @page { size: __PAPER__; margin: 16mm 14mm 18mm; }
 @page {
-  @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8pt "Inter", sans-serif; color: #6C736D; }
+  @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8pt -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #6C736D; }
 }
 @media print {
   body { background: #FFFFFF; font-size: 10.5pt; }

@@ -17,10 +17,7 @@ from . import charts as ch
 ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 TONES = {"problem", "strength", "watch", "neutral"}
 PRIORITY = {"now": "Act now", "next": "Plan next", "protect": "Protect"}
-FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
-         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700'
-         '&family=Space+Grotesk:wght@500;600;700&display=swap">')
+
 
 
 def e(x) -> str:
@@ -630,7 +627,7 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
                ("" if brand.get("logo") else " nologo")
     html = (f'<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
-            f'<title>{e(title_txt)}</title><meta name="generator" content="Insight Badger">{FONTS}'
+            f'<title>{e(title_txt)}</title><meta name="generator" content="Insight Badger">'
             f'<style>{css}\n{root}</style></head>'
             f'<body class="{body_cls}" data-default-brand="{e(brand["mode"])}" data-file-title="{e(file_title)}">'
             f'{appbar}{cover}{hero}'

@@ -6,7 +6,7 @@ description: >
   "explore this survey", "what's interesting in this survey", "find insights", "what can you tell me about these
   responses", or drops a survey export without specific questions. Also triggers on "run dig-deep" or "/dig-deep".
 argument-hint: "[survey file] [codebook file]"
-allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py *), Bash(python ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py *)
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/ib.py *), Bash(python ${CLAUDE_SKILL_DIR}/scripts/ib.py *)
 metadata:
   version: "0.3.0"
 ---
@@ -23,9 +23,24 @@ answers, skip logic, weights, multiple-comparison adjustment and personal data.
 Your job is judgement and words: check the profile, choose the KPI, code the
 open text, and write the narrative.
 
-`IB` below means `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py` (use `python`
-if `python3` is not found). Method details: `${CLAUDE_PLUGIN_ROOT}/docs/methods.md`.
-Narrative format: `${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`.
+## 0. Set up
+
+`IB` below means `python3 ${CLAUDE_SKILL_DIR}/scripts/ib.py` (use `python` if
+`python3` is not found). If that path does not exist (for example in Claude.ai
+chat, where it may stay a placeholder), the engine is in the `scripts/` folder
+next to this SKILL.md: find it with `find / -name ib.py -path "*dig-deep*" 2>/dev/null | head -1`
+and use that path.
+
+The engine needs pandas, numpy, scipy, scikit-learn and openpyxl. If a command
+fails with a missing package, **ask the user before installing anything**, then
+run `pip install -r <scripts folder>/requirements.txt`.
+
+Save working files and the report where the user can open them: by default
+`./insight-badger/<file name>/` in the current folder; on Claude.ai, pass
+`--out` with the outputs folder the environment provides.
+
+Method details: [reference/methods.md](reference/methods.md).
+Narrative format: [reference/narrative.md](reference/narrative.md).
 
 ## 1. Profile
 
@@ -33,9 +48,6 @@ Narrative format: `${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`.
 IB profile "<survey file>" [--codebook "<codebook>"]
 ```
 
-Requires pandas, numpy, scipy, scikit-learn (and openpyxl for XLSX). If they
-are missing, install them with
-`pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt` and say so.
 
 Read the column list. Check that:
 - the KPI candidate is right (NPS, overall satisfaction, likelihood to renew);
@@ -69,7 +81,7 @@ If the digest lists open-text questions, read
 manager would recognise and assign every answer one or more themes plus a
 sentiment (`negative`, `mixed`, `positive`). Pick 1–2 vivid, representative
 examples per theme. Write `codes.json` in the same folder (format in
-methods.md) and run:
+[reference/methods.md](reference/methods.md)) and run:
 
 ```bash
 IB themes --codes insight-badger/<file>/codes.json --results insight-badger/<file>/results.json
@@ -78,7 +90,7 @@ IB themes --codes insight-badger/<file>/codes.json --results insight-badger/<fil
 ## 4. Write the narrative
 
 Write `insight-badger/<file>/narrative.json` following
-`${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`. For dig-deep:
+[reference/narrative.md](reference/narrative.md). For dig-deep:
 
 - **title**: the single most important finding, as a sentence.
 - **answer**: 2–3 sentences, leading with the KPI and its biggest driver.
