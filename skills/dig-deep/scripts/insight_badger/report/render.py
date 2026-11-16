@@ -116,23 +116,6 @@ def brand_html(c: Ctx, small: bool = False) -> str:
     return f'<div class="brand">{mark}<span class="name">{e(b["name"])}{tag}</span></div>'
 
 
-def pdf_menu(c: Ctx) -> str:
-    custom = c.brand["mode"] == "custom"
-    branded_name = c.brand["name"] if custom else "Insight Badger"
-    return f'''<div class="pdf">
-<button class="pdf-btn" type="button" aria-haspopup="menu" aria-expanded="false">
-<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0L4.8 6.8M8 10l3.2-3.2M3 12.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-<span>Download <span class="lbl-long">PDF</span></span>
-<svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5l3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-</button>
-<div class="pdf-menu" role="menu" hidden>
-<div class="mh">Download as PDF</div>
-<button class="pdf-opt" type="button" role="menuitem" data-brand="branded"><span class="thumb"><span class="lg"></span><i class="t"></i><i></i><i class="s"></i></span><span><b>{e(branded_name)} branded</b><small>Logo on the cover, name and credit in the footer</small></span></button>
-<button class="pdf-opt" type="button" role="menuitem" data-brand="unbranded"><span class="thumb"><span class="lg none"></span><i class="t"></i><i></i><i class="s"></i></span><span><b>Unbranded</b><small>No logo or product name. Ready to send as your own.</small></span></button>
-<div class="fine">Every tab is included, one chapter per page, with page numbers. In the print window, choose "Save as PDF".</div>
-</div></div>'''
-
-
 # ── figures ──────────────────────────────────────────────────────────────────
 
 def figure(c: Ctx, f: dict) -> str:
@@ -587,10 +570,10 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
             f'<span class="mode">{mode_label}</span>{asked}<h1>{title_html}</h1>{sub_html}{scope}</div>'
             f'{stats_html(stats)}</div></header>')
     brand_block = brand_html(c) or f'<div class="brand">{e(survey)}</div>'
-    # Top bar: brand on the left, Download PDF on the right. Survey details live in
-    # the hero and the date in the footer, so they are not repeated here.
+    # Top bar: brand on the left, generation date on the right. PDFs come from
+    # ib.py pdf or the browser's print (the print stylesheet adds a cover page).
     appbar = (f'<div class="appbar wrap screen-only"><div class="inner">{brand_block}'
-              f'<div class="bar-right">{pdf_menu(c)}</div></div></div>')
+              f'<span class="stamp num">Generated on {e(generated)}</span></div></div>')
     conf_html = '<span class="conf-label">Confidential</span>' if brand.get("confidential") else ""
     q_html = f'<p class="meta">You asked: &ldquo;{e(question)}&rdquo;</p>' if is_for and question else ""
     n_resp = f"{meta['n_analysed']:,} responses"

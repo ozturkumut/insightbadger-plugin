@@ -4,8 +4,8 @@
 
 ### What changes for you
 
-- Reports look different: a headline finding, key figures, chapter tabs and a Download PDF button (branded or
-  unbranded). Reports no longer load anything from the internet.
+- Reports look different: a headline finding, key figures and chapter tabs. Ask Claude for a PDF, branded or
+  unbranded. Reports no longer load anything from the internet.
 - Results are saved in an `insight-badger/<file name>/` folder next to where you work, together with a few working
   files (`profile.json`, `results.json`, `texts.json`, `codes.json`, `narrative.json`) that make each run
   reproducible. You can delete them once you have the report.
@@ -23,7 +23,7 @@
 - Personal data kept out of reports and removed from quotes; no raw data rows in the report.
 - Open-text themes coded by Claude in any language, counted by the engine.
 - New storytelling report: headline finding, key figures, chapter tabs, story map, driver matrix, group dot plots, two-group comparisons, personas, quote cards, light colour-coded design with the badger logo.
-- Download PDF with branded or unbranded output, `--pdf` export, and custom branding via `.insight-badger.json`.
+- PDF export with a cover page and page numbers, branded or unbranded (`--pdf`, `ib.py pdf`), and custom branding via `.insight-badger.json`.
 - Charts are inline SVG and fonts are system fonts: reports work offline and make no network requests (no Chart.js CDN, no Google Fonts).
 - Each skill carries its own copy of the engine (Claude.ai chat copies only the skill's folder), referenced through `${CLAUDE_SKILL_DIR}`.
 - PDF export keeps Chrome's sandbox on unless running as root.

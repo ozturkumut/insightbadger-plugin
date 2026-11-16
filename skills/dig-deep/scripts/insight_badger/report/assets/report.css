@@ -48,29 +48,9 @@ em.hl-good { font-style: normal; color: var(--teal-deep); font-weight: 600; }
 .brand { display: flex; align-items: center; gap: 9px; font: 600 15px var(--font-display); color: var(--teal-deep); }
 .brand .name { display: grid; line-height: 1.15; }
 .brand .name small { font: 500 11.5px var(--font-body); color: var(--muted); }
+.stamp { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .mark { flex: none; width: 38px; height: 38px; background: var(--logo) center / contain no-repeat; }
-.bar-right { display: flex; align-items: center; gap: 14px; }
 
-/* Download PDF */
-.pdf { position: relative; }
-.pdf-btn { display: inline-flex; align-items: center; gap: 8px; font: 600 13.5px var(--font-body); color: var(--surface); background: var(--teal-deep); border: 0; border-radius: 9px; padding: 8px 12px 8px 11px; cursor: pointer; }
-.pdf-btn:hover { background: var(--teal); }
-.pdf-btn svg { width: 16px; height: 16px; flex: none; }
-.pdf-btn .chev { width: 12px; height: 12px; transition: transform .15s; }
-.pdf-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
-.pdf-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: 300px; max-width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 32px rgba(57,64,58,.14), 0 2px 6px rgba(57,64,58,.06); padding: 8px; display: grid; gap: 4px; }
-.pdf-menu .mh { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); padding: 6px 10px 4px; }
-.pdf-opt { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; text-align: left; background: transparent; border: 1px solid transparent; border-radius: 10px; padding: 8px 10px; cursor: pointer; font: inherit; color: var(--ink); }
-.pdf-opt:hover, .pdf-opt:focus-visible { background: var(--teal-wash); border-color: var(--teal-pale); }
-.pdf-opt b { display: block; font-size: 14px; font-weight: 600; }
-.pdf-opt small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
-.thumb { width: 44px; height: 56px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(57,64,58,.08); padding: 6px 5px; display: grid; align-content: start; gap: 4px; }
-.thumb i { display: block; height: 3px; border-radius: 2px; background: var(--neutral); }
-.thumb i.t { height: 5px; width: 80%; background: var(--ink); }
-.thumb i.s { width: 60%; }
-.thumb .lg { width: 14px; height: 14px; background: var(--logo) center / contain no-repeat; }
-.thumb .lg.none { background: none; border: 1px dashed var(--neutral); border-radius: 3px; }
-.pdf-menu .fine { font-size: 11.5px; color: var(--muted); padding: 6px 10px 4px; border-top: 1px solid var(--line); margin-top: 2px; }
 
 /* Hero */
 .hero { background: var(--teal-wash); padding-block: 30px 26px; border-bottom: 1px solid var(--teal-pale); }
@@ -324,15 +304,9 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
 /* Tabs need scripts. Without them (some app previews), every section shows as
    one long page and the controls that need scripts are hidden. */
 .js [role="tabpanel"]:not(.active) { display: none; }
-.no-js .tabbar, .no-js .pager, .no-js .pdf, .no-js .story .go { display: none !important; }
+.no-js .tabbar, .no-js .pager, .no-js .story .go { display: none !important; }
 .no-js [role="tabpanel"] + [role="tabpanel"] { border-top: 1px solid var(--line); }
-.notice-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(57,64,58,.42); display: grid; place-items: center; padding: 16px; }
-.notice { background: var(--surface); border-radius: 14px; max-width: 460px; padding: 20px 22px; display: grid; gap: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.22); }
-.notice h2 { font-size: 18px; }
-.notice p { font-size: 14px; }
-.notice code { font-size: 12.5px; background: var(--teal-wash); padding: 1px 6px; border-radius: 4px; }
-.notice button { justify-self: end; font: 600 13.5px var(--font-body); color: var(--surface); background: var(--teal-deep); border: 0; border-radius: 9px; padding: 8px 14px; cursor: pointer; }
-.nologo .mark, .nologo .thumb .lg { display: none; }
+.nologo .mark { display: none; }
 
 @media (max-width: 900px) {
   .hero .inner { grid-template-columns: minmax(0, 1fr); }
@@ -347,7 +321,6 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
   .stat + .stat { border-left: 0; }
   .stat:nth-child(even) { border-left: 1px solid var(--line); }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
-  .pdf-btn .lbl-long { display: none; }
   .storymap, .split, .personas, .quotes { grid-template-columns: minmax(0, 1fr); }
   .lk-row { grid-template-columns: 96px minmax(0, 1fr) 38px; font-size: 12px; }
   .theme { grid-template-columns: 112px minmax(0, 1fr) 36px; font-size: 12px; }
@@ -363,7 +336,7 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
 }
 @media print {
   body { background: #FFFFFF; font-size: 10.5pt; }
-  .appbar, .tabbar, .pdf, .pager, .hero, .screen-only { display: none !important; }
+  .appbar, .tabbar, .pager, .hero, .screen-only { display: none !important; }
   .cover, .print-only { display: block; }
   .cover { break-after: page; min-height: 240mm; position: relative; padding-top: 10mm; }
   .cover .brand { margin-bottom: 40mm; }
@@ -377,7 +350,6 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
   .print-stats { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin-bottom: 6mm; }
   .print-stats .stat { border: 1px solid var(--line) !important; border-radius: 8px; }
   [role="tabpanel"], .js [role="tabpanel"]:not(.active) { display: block !important; }
-  .notice-backdrop { display: none !important; }
   [role="tabpanel"] { break-before: page; padding-block: 0; }
   [role="tabpanel"]:first-of-type { break-before: auto; }
   .figure, .quote, .persona, .story, .reason, .action, tr, .lk-row, .theme { break-inside: avoid; }

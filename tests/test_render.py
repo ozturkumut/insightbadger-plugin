@@ -30,7 +30,7 @@ def test_deep_report_renders_without_warnings(q_results):
     html, warnings = render_report(r, narrative, load_brand("insight-badger"))
     assert warnings == []
     for needle in ('id="p-overview"', 'id="p-ch-drivers"', 'id="p-questions"', 'id="p-data"', "FIX FIRST",
-                   'class="pdf-menu"', 'data-brand="unbranded"', "Frustrated small teams", 'class="cover"'):
+                   'Generated on ', "Frustrated small teams", 'class="cover"'):
         assert needle in html
     assert "example.com" not in html and "RecipientEmail" not in html
     assert "<script src" not in html  # no external scripts: works offline
@@ -100,6 +100,6 @@ def test_navigation_works_in_app_previews(q_results):
     html, _ = render_report(r, narrative, load_brand("insight-badger"))
     assert 'href="#' not in html
     assert '<html lang="en" class="no-js">' in html and "className='js'" in html
-    assert 'role="tabpanel" hidden' not in html and " hidden>" not in html.split('class="pdf-menu"')[0]
+    assert 'role="tabpanel" hidden' not in html
     assert '.js [role="tabpanel"]:not(.active) { display: none; }' in html
-    assert "This viewer can" in html  # explains a blocked print window
+    assert "pdf-btn" not in html and "window.print" not in html  # no print button that previews would block

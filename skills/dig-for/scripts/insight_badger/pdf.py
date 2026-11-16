@@ -1,8 +1,8 @@
 """Save a report as PDF without the browser's print dialog.
 
 Tries, in order: Playwright (Python), a Chrome/Chromium/Edge binary in
-headless mode, then WeasyPrint. If none is available the report's own
-"Download PDF" button still works in any browser.
+headless mode, then WeasyPrint. If none is available, printing the report from
+a browser (Cmd/Ctrl+P, Save as PDF) gives the same layout.
 """
 
 from __future__ import annotations
@@ -92,8 +92,8 @@ def html_to_pdf(html_path: str, out: str | None = None, brand_mode: str = "insig
             return out, f"Wrote PDF {out} (WeasyPrint)"
         except ImportError:
             pass
-        return None, (f"{err}, and WeasyPrint is not installed. Open the HTML report in a browser and use its "
-                      "Download PDF button instead, or install a PDF engine: pip install weasyprint")
+        return None, (f"{err}, and WeasyPrint is not installed. Open the HTML report in a browser and "
+                      "print to PDF from there (Cmd/Ctrl+P), or install a PDF engine: pip install weasyprint")
     finally:
         try:
             os.unlink(src)

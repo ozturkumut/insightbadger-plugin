@@ -119,8 +119,8 @@ the README).
 2–3 short paragraphs: the KPI and the most actionable finding, the biggest
 gap or segment, and what to do next. Give the report path and suggest opening
 it in a web browser (Chrome, Edge, Safari, Firefox): app previews may show it
-as one long page and cannot print. Mention that the report's **Download PDF**
-button offers branded and unbranded versions. Do not paste tables. No emoji.
+as one long page. Offer a PDF, branded or unbranded. Do not paste tables.
+No emoji.
 
 ## PDF requests
 
@@ -133,7 +133,9 @@ IB pdf <report.html> [--brand none]
 
 It uses Chrome, Edge or WeasyPrint if one is available. If it reports that no
 PDF engine is available (common in sandboxes), tell the user to open the
-report in their browser and use its **Download PDF** button.
+report in a browser and print it (Cmd/Ctrl+P, then Save as PDF). For an
+unbranded print, first render a copy with `--brand none --out <name>-unbranded.html`
+and point them to that file.
 
 ## Guardrails
 

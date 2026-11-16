@@ -123,8 +123,8 @@ Fix every `Warning:` line and render again. `--pdf` also saves a PDF;
 Lead with the direct answer and its number, like briefing a colleague. One
 short paragraph of supporting evidence, one line of caveats, then the report
 path, a suggestion to open it in a web browser (app previews may show it as
-one long page and cannot print), and a mention of the **Download PDF** button
-(branded or unbranded). No emoji, no tables.
+one long page), and an offer of a PDF (branded or unbranded). No emoji, no
+tables.
 
 ## PDF requests
 
@@ -137,7 +137,9 @@ IB pdf <report.html> [--brand none]
 
 It uses Chrome, Edge or WeasyPrint if one is available. If it reports that no
 PDF engine is available (common in sandboxes), tell the user to open the
-report in their browser and use its **Download PDF** button.
+report in a browser and print it (Cmd/Ctrl+P, then Save as PDF). For an
+unbranded print, first render a copy with `--brand none --out <name>-unbranded.html`
+and point them to that file.
 
 ## Guardrails
 

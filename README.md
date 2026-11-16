@@ -39,14 +39,14 @@ Every run produces a single self-contained HTML file that works offline:
 
 ### PDF, branded or unbranded
 
-The **Download PDF** button at the top right offers two versions:
+Ask for a PDF in the chat ("…and give me an unbranded PDF"). Claude saves it next to the report, using your local
+Chrome, Edge or WeasyPrint:
 
 - **Insight Badger branded**: logo on the cover, credit in the footer.
 - **Unbranded**: no logo or product name, ready to send as your own.
 
-Either version prints with a cover page, one chapter per page and page numbers. You can also ask for a PDF in chat
-("…and give me an unbranded PDF"); the skill saves it next to the report using your local Chrome, Edge or
-WeasyPrint.
+You can also open the report in a browser and print it (Cmd/Ctrl+P, then Save as PDF). Either way the PDF has a
+cover page, one chapter per page and page numbers.
 
 ### Your own brand
 
@@ -92,8 +92,7 @@ Insight Badger runs entirely on your computer (or in Claude's code sandbox on Cl
   Claude asks before running `pip install`, which downloads them from the Python Package Index. Optional:
   `pyreadstat` for SPSS files, `weasyprint` for PDFs.
 - **PDF export:** when you ask for a PDF in chat, the script opens your local Chrome, Chromium or Edge in headless
-  mode (or uses WeasyPrint) to print the report to a file. The Download PDF button in the report uses your
-  browser's own print window.
+  mode (or uses WeasyPrint) to print the report to a file.
 - **Network:** none. The script makes no network requests, and reports use system fonts and inline charts, so
   opening a report fetches nothing from the internet.
 - **Personal data:** columns such as names, emails, phone numbers and IP addresses are never shown in reports, and
