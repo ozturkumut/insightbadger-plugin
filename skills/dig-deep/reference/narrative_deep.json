@@ -1,0 +1,46 @@
+{
+  "survey_name": "Customer Experience Survey",
+  "wave": "Wave 3",
+  "fieldwork": "2-20 Oct 2026",
+  "title": "Customers rely on the product, but [[a slow start and the price]] are costing recommendations",
+  "subtitle": "What explains the scores, who is least happy, and what to do next.",
+  "answer": "NPS is [[below zero]]. People who recommend us praise {{reliability}}. People who don't mostly struggled with onboarding or feel the price is too high, and small companies feel this most.",
+  "labels": {"Q2_1": "Onboarding clarity", "Q2_2": "Support speed", "Q2_3": "Reliability", "Q2_4": "Documentation",
+             "Q2_5": "Value for money", "Q2_6": "Integrations", "Q3": "Company size"},
+  "chapters": [
+    {"id": "drivers", "tab": "Drivers", "tag": "Fix first", "tone": "problem",
+     "title": "Onboarding and price matter most, and [[both score low]]",
+     "summary": "Two items explain most of the difference in NPS, and only about a third rate them well.",
+     "lede": "We measured how strongly each rating is linked to recommending us, and how many people rate it well.",
+     "figures": [{"type": "drivers"}],
+     "so_what": "Improving onboarding and how value is communicated is the change most likely to move NPS."},
+    {"id": "groups", "tab": "Groups", "tag": "Gap", "tone": "problem",
+     "title": "The smaller the company, [[the less likely they are to recommend us]]",
+     "summary": "Companies of 1-10 people score far below companies of 250+.",
+     "figures": [{"type": "groups", "dimension": "Q3"}, {"type": "pair", "dimension": "Q3"}],
+     "so_what": "Small companies trail on onboarding and value, not on reliability."},
+    {"id": "mindsets", "tab": "Mindsets", "tag": "At risk", "tone": "problem",
+     "title": "Three mindsets, and one is [[deeply unhappy]]",
+     "summary": "About one in six people rate almost everything low.",
+     "figures": [{"type": "segments"}]},
+    {"id": "comments", "tab": "Comments", "tag": "Voice", "tone": "neutral",
+     "title": "In their own words, setup and price come up most",
+     "summary": "Comments match the scores: setup and price are the main complaints.",
+     "figures": [{"type": "themes", "column": "Q7"}, {"type": "quotes", "column": "Q7"}]},
+    {"id": "ratings", "tab": "All ratings", "tone": "neutral",
+     "title": "Reliability is the only item most people rate well",
+     "summary": "Every other experience item is rated well by fewer than half.",
+     "figures": [{"type": "ratings", "highlight": ["Q2_1", "Q2_5"]}]}
+  ],
+  "segments": {"0": {"name": "Settled advocates"}, "1": {"name": "Lukewarm middle"},
+               "2": {"name": "Frustrated small teams", "flag": true}},
+  "actions": [
+    {"priority": "now", "text": "Redesign first-week setup, starting with companies under 10 people."},
+    {"priority": "next", "text": "Test a lighter plan for small teams."},
+    {"priority": "protect", "text": "Keep reliability where it is; it is what promoters praise."}
+  ],
+  "next_questions": [
+    {"text": "Why are small companies less likely to recommend us?", "skill": "dig-for"},
+    {"text": "Which setup steps do unhappy customers mention most?", "skill": "dig-for"}
+  ]
+}

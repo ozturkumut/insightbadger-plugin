@@ -1,0 +1,33 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.9 is still the python3 that ships with macOS, so keep it covered.
+        # uv installs it; actions/setup-python no longer offers 3.9 on current runners.
+        python: ["3.9", "3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uv venv --python ${{ matrix.python }} .venv
+      - run: uv pip install --python .venv -r skills/dig-deep/scripts/requirements.txt pytest
+      - run: .venv/bin/python tools/sync_engine.py --check
+      - run: .venv/bin/python -m pytest -q
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: ./tools/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: insight-badger
+          path: dist/insight-badger.zip
