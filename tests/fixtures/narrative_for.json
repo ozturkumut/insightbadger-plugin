@@ -1,0 +1,36 @@
+{
+  "survey_name": "Customer Experience Survey",
+  "wave": "Wave 3",
+  "question": "Why are small companies less likely to recommend us?",
+  "scope": ["Companies of 1-10 vs 250+", "Speeders removed"],
+  "title": "Small companies [[struggle with onboarding]] and question the price",
+  "answer": "Companies of 1-10 people score NPS [[-49 against +26]] for 250+. Two things explain most of the gap: onboarding and value for money. {{Reliability}} is rated about the same by both.",
+  "labels": {"Q2_1": "Onboarding clarity", "Q2_2": "Support speed", "Q2_3": "Reliability", "Q2_4": "Documentation",
+             "Q2_5": "Value for money", "Q2_6": "Integrations", "Q3": "Company size"},
+  "stats": [
+    {"label": "NPS gap", "value": "75 pts", "note": "-49 vs +26", "tone": "lead"},
+    {"label": "Biggest rating gap", "value": "42 pts", "note": "Value for money", "tone": "alert"},
+    {"label": "Small companies", "value": "118", "note": "responses", "tone": "plain"},
+    {"label": "Large companies", "value": "62", "note": "responses", "tone": "plain"}
+  ],
+  "reasons": [
+    {"label": "Reason 1 · Price", "value": "-42 pts", "text": "18% of small companies say we are good value, against 60% of large ones."},
+    {"label": "Reason 2 · Onboarding", "value": "-37 pts", "text": "20% of small companies say onboarding was clear, against 56%."}
+  ],
+  "not_cause": "reliability, documentation and support are rated about the same by both groups.",
+  "chapters": [
+    {"id": "evidence", "tab": "Evidence", "tone": "problem",
+     "title": "Small companies trail [[on price and onboarding]], not on the product",
+     "figures": [{"type": "groups", "dimension": "Q3"}, {"type": "pair", "dimension": "Q3"}],
+     "so_what": "The product works as well for small companies; the gap is in getting started and in price."},
+    {"id": "words", "tab": "In their words", "tone": "neutral",
+     "title": "Small companies describe setup without help",
+     "figures": [{"type": "quotes", "column": "Q7"}]}
+  ],
+  "actions": [{"priority": "now", "text": "Offer guided setup to every new company under 10 people."},
+              {"priority": "next", "text": "Test a smaller plan priced for 2-5 seats."}],
+  "next_questions": [{"text": "Do new and established small companies differ on setup?", "skill": "dig-for"},
+                     {"text": "See every customer mindset in this survey", "skill": "dig-deep"}],
+  "caveats": [{"level": "solid", "text": "Both groups have more than 60 responses, and the gaps hold after adjusting for the number of comparisons."},
+              {"level": "watch", "text": "The 250+ group has 62 people, so its score could move by about 15 points in a repeat survey."}]
+}
