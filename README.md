@@ -1,49 +1,93 @@
-# Insight Badger: development repository
+<p align="center"><img src="assets/logo.png" width="120" alt="Insight Badger logo"></p>
 
-This repository holds two editions of the Insight Badger plugin.
+# Insight Badger
 
-| Folder | Edition | Status |
-|---|---|---|
-| [`plugin/`](plugin/) | **0.2.5**, Markdown only: Claude writes the analysis each run, guided by `reference/methods.md` and the report template in `reference/report.md` | Submitted to the plugin directory. **Submit this folder.** |
-| [`engine/`](engine/) | **0.3.0**, with a tested Python engine that computes every number | Ships once the publisher's organization is Verified: the directory accepts scripts and pre-approved commands only from Verified organizations |
+Survey insights for people who don't analyse surveys for a living. Drop a survey export from Qualtrics,
+SurveyMonkey, Google Forms, Typeform, Microsoft Forms, SPSS or any CSV/XLSX, and get a plain-language,
+storytelling report: what drives your score, who is unhappy, what people say in their own words, and what to do
+next.
 
-User documentation: [plugin/README.md](plugin/README.md).
+No spreadsheet formulas, no SPSS, no coding.
 
-## Layout
+## Skills
 
+### `/dig-deep`: explore a survey
+
+Hand over a file and Insight Badger works out the rest: the questionnaire structure, the KPI, what drives it, which
+groups differ, the customer mindsets in your data and the themes in open comments.
+
+Try: *"dig deep into survey.csv"*, *"what's interesting in these responses?"*
+
+### `/dig-for`: answer one question
+
+You have a question; Insight Badger asks one or two clarifying questions, then delivers a focused brief that leads
+with the answer.
+
+Try: *"what's driving our NPS?"*, *"why are small customers less happy?"*, *"compare enterprise vs SMB on
+onboarding"*, *"what do detractors complain about?"*
+
+## The report
+
+Every run produces one self-contained HTML file that works offline:
+
+- **Header** with the headline finding and the key figures (score, likely range, change since last wave, completion).
+- **Overview / Answer** tab: the answer in two or three sentences, a story map of the chapters, recommended actions
+  and the next questions to dig into.
+- **Chapter tabs**: drivers (importance vs performance, with "fix first" and "protect" zones), group gaps with
+  likely ranges, two-group comparisons, customer mindsets as personas, comment themes with quotes.
+- **Reference tabs**: every question as a card, data quality and plain-language methods.
+- **Colour means something**: teal for strengths, clay for problems, ochre for "watch", slate for comparisons.
+
+Open the report in a web browser for the best view; app previews may show it as one long page.
+
+### PDF, branded or unbranded
+
+Ask for a PDF ("…and give me an unbranded PDF"), or open the report in a browser and print it (Cmd/Ctrl+P, then
+Save as PDF). The PDF has a cover page, one chapter per page and page numbers.
+
+- **Insight Badger branded**: logo on the cover, credit in the footer.
+- **Unbranded**: no logo or product name, ready to send as your own.
+
+### Your own brand
+
+Put a `.insight-badger.json` file in your project folder (or any parent folder):
+
+```json
+{
+  "brand": "custom",
+  "name": "Acme Research",
+  "logo": "brand/acme-logo.png",
+  "primary": "#1F5FAD",
+  "paper": "Letter",
+  "confidential": true
+}
 ```
-plugin/      the directory edition (Markdown, JSON and PNG only)
-engine/      the engine edition (skills with scripts/, reference docs)
-tests/       pytest suite for the engine, with synthetic Qualtrics, SurveyMonkey and Google Forms exports
-examples/    sample survey with known patterns, for trying either edition
-tools/       sync, generation and build scripts
-```
 
-## Development
+`brand` can be `insight-badger` (default), `none` or `custom`.
 
-```bash
-pip install -r engine/skills/dig-deep/scripts/requirements.txt pytest
-python3 -m pytest                      # engine tests
-python3 tools/sync_engine.py           # copy the engine from engine/skills/dig-deep into dig-for
-python3 tools/build_edition_025.py     # regenerate plugin/skills/*/reference from methods.md and the engine's CSS/JS
-./tools/build.sh                       # check everything and build dist/insight-badger-<version>.zip for both editions
-```
+## What it handles
 
-- Edit 0.2.5 method guidance in `plugin/skills/dig-deep/reference/methods.md` and the report guide in
-  `tools/report_guide.src.md`; the build script copies them into both skills.
-- The report template's CSS and JavaScript live once, in the engine
-  (`engine/skills/dig-deep/scripts/insight_badger/report/assets/`), and are copied into the 0.2.5 guide, so both
-  editions render the same design.
-- CI fails if `plugin/` contains anything the directory would refuse from an unverified organization: files other
-  than Markdown, text, JSON, YAML or images, files starting with `#!`, or `allowed-tools` entries.
+- **Exports from every major platform**, including Qualtrics' three header rows and SurveyMonkey's two, Google
+  Forms grids and checkboxes, XLSX and SPSS, plus an optional codebook.
+- **Question types**: NPS, agreement/satisfaction/frequency/quality scales (5- or 7-point, text or numbers), CSAT,
+  CES, numeric ratings, single choice, multi-select, open text, numbers and demographics.
+- **"Don't know" and "Not applicable"** are left out of percentages.
+- **Data quality**: completion, speeders, straight-liners, routing (skip logic) and drop-off, in plain words.
+- **Sound statistics**: correct NPS likely ranges, survey weights, gaps adjusted for the number of comparisons,
+  groups under 30 people never called significant.
+- **Drivers**, **customer mindsets** and **comment themes** coded by Claude in any language.
 
-## Releasing
+## What this plugin runs and sends
 
-1. Raise `version` in the edition's `.claude-plugin/plugin.json` and both `SKILL.md` files (the engine edition also
-   in `scripts/insight_badger/__init__.py`); the build checks they match. Users only get an update when the version
-   changes.
-2. `./tools/build.sh`, then `claude plugin validate --strict plugin`.
-3. Merge to `main` and publish the version in the developer portal.
+- **What it runs**: Claude writes and runs a short Python analysis for your file (pandas, numpy, scipy,
+  scikit-learn) and saves its working files and the report in `insight-badger/<file name>/` next to the survey. You
+  approve these steps as usual. If a package is missing, Claude asks before installing it.
+- **PDF**: when you ask for a PDF, Claude asks before printing the report with your local Chrome or Edge.
+- **Network**: none. Reports use inline charts and system fonts and fetch nothing from the internet.
+- **Personal data**: names, emails, phone numbers and IP addresses never appear in reports, and are removed from
+  quotes. No raw data rows appear in reports.
+- **Credentials**: none are read or needed.
 
-When the organization is Verified: move `engine/` into `plugin/` (keeping its `allowed-tools` in the
-`${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_SKILL_DIR}` form), raise the version to 0.3.0 and submit.
+## Licence
+
+Apache 2.0
