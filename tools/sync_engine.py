@@ -2,7 +2,7 @@
 """Copy the engine and reference docs from dig-deep (the source) into dig-for.
 
 Claude.ai chat copies only a skill's own folder into its sandbox, so each skill
-must carry its own copy of the engine. Edit files under skills/dig-deep only,
+must carry its own copy of the engine. Edit files under engine/skills/dig-deep only,
 then run:
 
     python3 tools/sync_engine.py          # copy
@@ -17,8 +17,8 @@ import shutil
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SOURCE = os.path.join(ROOT, "skills", "dig-deep")
-TARGETS = [os.path.join(ROOT, "skills", "dig-for")]
+SOURCE = os.path.join(ROOT, "engine", "skills", "dig-deep")
+TARGETS = [os.path.join(ROOT, "engine", "skills", "dig-for")]
 SHARED = ["scripts", "reference"]
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc")
 

@@ -10,7 +10,7 @@ from insight_badger.report.render import render_report
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIX = os.path.join(HERE, "fixtures")
-IB = os.path.join(HERE, "..", "skills", "dig-deep", "scripts", "ib.py")
+IB = os.path.join(HERE, "..", "engine", "skills", "dig-deep", "scripts", "ib.py")
 
 
 def _coded(q_results):
