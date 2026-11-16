@@ -110,3 +110,16 @@ def test_codebook_overrides_labels(tmp_path, qualtrics):
     from insight_badger.loading import load_codebook
     prof = build_profile(qualtrics, load_codebook(str(cb)))
     assert next(c for c in prof["columns"] if c["id"] == "Q3")["label"] == "Company size band"
+
+
+def test_thousands_separator_is_not_a_multiselect():
+    vals = rng.choice(["1-10 employees", "11-50 employees", "251-1,000 employees", "1,000+ employees"], 300)
+    assert t(vals, "Q9", "How many people work at your company?") == "demographic"
+
+
+def test_location_question_is_demographic():
+    assert t(rng.choice(["Europe", "North America", "Asia Pacific"], 300), "Q13", "Where is your company based?") == "demographic"
+
+
+def test_qualtrics_status_column_is_metadata():
+    assert t(rng.choice(["IP Address", "Survey Preview"], 300), "Status", "Response Type") == "metadata"

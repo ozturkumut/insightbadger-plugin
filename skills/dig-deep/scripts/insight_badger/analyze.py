@@ -52,9 +52,26 @@ def apply_filters(df: pd.DataFrame, filters: list[str]) -> tuple[pd.DataFrame, l
     return df, applied
 
 
+_UNITS = {"day": 1 / 365, "week": 1 / 52, "month": 1 / 12, "year": 1.0}
+
+
 def _lead(v):
-    mt = re.match(r"^\s*(?:under|less than|<|>|over|more than)?\s*\$?(\d[\d,]*(?:\.\d+)?)", str(v), re.I)
-    return float(mt.group(1).replace(",", "")) if mt else None
+    """Sort key for bands: '1-10', '1,000+', 'Less than 6 months', 'More than 2 years'."""
+    text = str(v).strip().lower()
+    mt = re.match(r"^(under|less than|fewer than|up to|<|>|over|more than|at least)?\s*\$?(\d[\d,]*(?:\.\d+)?)",
+                  text)
+    if not mt:
+        return None
+    value = float(mt.group(2).replace(",", ""))
+    unit = re.search(r"(day|week|month|year)", text)
+    if unit:
+        value *= _UNITS[unit.group(1)]
+    prefix = mt.group(1) or ""
+    if prefix in ("under", "less than", "fewer than", "up to", "<"):
+        value -= 1e-6
+    elif prefix in ("over", "more than", "at least", ">") or text.split()[0].endswith("+"):
+        value += 1e-6
+    return value
 
 
 def _group_order(values: list) -> list:
@@ -178,7 +195,15 @@ def run(survey, profile: dict, kpi: str | None = None, driver_cols: list[str] | 
     driver_block = {"available": False, "reason": "No KPI selected."}
     if kpi:
         if driver_cols is None:
-            driver_cols = [c for c, i in cols.items() if i["type"] in ORDINAL_TYPES and c != kpi and not i.get("pii")]
+            # Other outcome questions (overall satisfaction, likelihood to renew) are
+            # results, not drivers: using them would explain the KPI with itself.
+            outcomes = set(profile["kpi_candidates"])
+            driver_cols = [c for c, i in cols.items() if i["type"] in ORDINAL_TYPES and c != kpi
+                           and c not in outcomes and not i.get("pii")]
+            skipped = [c for c in outcomes if c != kpi and c in cols and cols[c]["type"] in ORDINAL_TYPES]
+            if skipped:
+                methods.append("Other overall questions (" + ", ".join(skipped) + ") were not used as drivers, "
+                               "because they measure the outcome rather than explain it.")
         driver_cols = [c for c in driver_cols if c in codes and c != kpi]
         if driver_cols:
             top_codes = {c: m.top_box_levels(cols[c])[0] for c in driver_cols}

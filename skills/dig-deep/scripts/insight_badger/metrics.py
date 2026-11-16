@@ -142,11 +142,9 @@ def multiselect_matrix(df: pd.DataFrame, group: dict) -> pd.DataFrame:
 
 
 def explode_multiselect_string(series: pd.Series, delimiter: str) -> pd.DataFrame:
+    from .detect import delimiter_pattern
     s = series.dropna().astype(str)
-    if delimiter == ",":
-        parts = s.str.split(r"\s*,\s*")
-    else:
-        parts = s.str.split(r"\s*" + ("\\|" if delimiter == "|" else delimiter) + r"\s*")
+    parts = s.str.split(delimiter_pattern(delimiter))
     parts = parts.map(lambda xs: [x.strip() for x in xs if x.strip()])
     options = [o for o, _ in Counter(o for xs in parts for o in xs).most_common()]
     mat = pd.DataFrame(False, index=series.index, columns=options)

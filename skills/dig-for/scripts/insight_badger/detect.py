@@ -29,6 +29,7 @@ _META = re.compile(
     r"languagecode|url|duplicate\w*))($|\b)",
     re.IGNORECASE,
 )
+_META_EXACT = {"status", "response type", "q_url", "collector", "language"}
 _PII = re.compile(
     r"(e-?mail|ip ?address|ipaddress|first ?name|last ?name|full ?name|^name$|your name|phone ?number|"
     r"telephone|mobile ?(number|phone)|^phone$|latitude|longitude|recipient|postcode|post code|zip ?code|"
@@ -48,7 +49,8 @@ _DEMO_HINT = re.compile(
     r"department|industry|sector|company ?size|employees|organi[sz]ation size|team size|"
     r"how many (people|staff|employees)|people work|work at your|number of (staff|people)|"
     r"tenure|how long have you|customer for|\bplan\b|\btier\b|segment|education|income|ethnic|"
-    r"customer type|account type)",
+    r"customer type|account type|where (is|are) (your|you)|based in|located|location of your|"
+    r"how long have you been)",
     re.IGNORECASE,
 )
 _DATE = re.compile(r"^\s*\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}([ T]\d{1,2}:\d{2}(:\d{2})?.*)?\s*$")
@@ -65,12 +67,20 @@ def _text_stats(s: pd.Series):
     return st.str.len().mean(), s.nunique(), len(s)
 
 
+def delimiter_pattern(delim: str) -> str:
+    """Split pattern for multi-select answers. A comma followed by exactly three
+    digits is a thousands separator ('1,000+ employees'), not a delimiter."""
+    if delim == ",":
+        return r"\s*,(?!\d{3}(?:\D|$))\s*"
+    return r"\s*" + re.escape(delim) + r"\s*"
+
+
 def _delimited_multiselect(s: pd.Series, delim: str) -> bool:
     """'A; B; C' or Google Forms 'A, B, C' answers: a small set of short options
     that recur across respondents. Free-text comments fail this test."""
     st = s.astype(str)
-    pattern = r"\s*" + re.escape(delim) + r"\s*"
-    if st.str.contains(re.escape(delim)).mean() < 0.15:
+    pattern = delimiter_pattern(delim)
+    if st.str.contains(pattern).mean() < 0.15:
         return False
     tokens = st.str.split(pattern).explode().str.strip()
     tokens = tokens[tokens != ""]
@@ -95,7 +105,8 @@ def detect_column(series: pd.Series, name: str, label: str) -> dict:
     info: dict = {"pii": bool(_PII.search(name) or _PII.search(label[:80]))}
     if len(s) == 0:
         return {**info, "type": "empty"}
-    if _META.search(name) or (label != name and _META.fullmatch(label.strip() or "-")):
+    if (_META.search(name) or (label != name and _META.fullmatch(label.strip() or "-"))
+            or name.strip().lower() in _META_EXACT or label.strip().lower() in _META_EXACT):
         return {**info, "type": "metadata"}
 
     numeric = pd.to_numeric(s, errors="coerce")

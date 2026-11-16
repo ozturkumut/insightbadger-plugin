@@ -115,3 +115,25 @@ def test_themes_counting(q_results):
     assert set(names[:2]) == {"Price for small teams", "Setup and onboarding"}
     assert out["themes"][0]["negative_pct"] == 100.0
     assert all(rid in out["quotes"] for t in out["themes"] for rid in t["example_ids"])
+
+
+def test_natural_order_of_bands():
+    from insight_badger.analyze import _group_order
+    assert _group_order(["More than 2 years", "1-2 years", "Less than 6 months", "6-12 months"]) == \
+        ["Less than 6 months", "6-12 months", "1-2 years", "More than 2 years"]
+    assert _group_order(["1,000+ employees", "1-10 employees", "251-1,000 employees", "11-50 employees"]) == \
+        ["1-10 employees", "11-50 employees", "251-1,000 employees", "1,000+ employees"]
+
+
+def test_other_outcome_questions_are_not_drivers():
+    import os
+    from insight_badger.analyze import run
+    from insight_badger.detect import build_profile
+    from insight_badger.loading import load_survey
+    path = os.path.join(os.path.dirname(__file__), "..", "examples", "sample-survey-qualtrics.csv")
+    sv = load_survey(path)
+    prof = build_profile(sv)
+    assert {"Q9", "Q11", "Q13"} <= set(prof["demographics"])
+    r, _ = run(sv, prof, compare=["Q9"], do_segments=False)
+    cols = [d["column"] for d in r["drivers"]["drivers"]]
+    assert "Q2" not in cols and set(cols[:3]) == {"Q3_1", "Q3_2", "Q3_5"}
