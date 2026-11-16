@@ -569,7 +569,6 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
     stats = n.get("stats") or default_stats(c)
     meta = results["meta"]
     survey = n.get("survey_name") or os.path.splitext(os.path.basename(meta["file"]))[0]
-    crumbs = [survey] + ([n["wave"]] if n.get("wave") else []) + ["Focused question" if is_for else "Full exploration"]
     gd = date.fromisoformat(meta["generated"]) if meta.get("generated") else None
     generated = f"{gd.day} {gd.strftime('%b %Y')}" if gd else ""
     question = n.get("question") or meta.get("question")
@@ -588,14 +587,10 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
             f'<span class="mode">{mode_label}</span>{asked}<h1>{title_html}</h1>{sub_html}{scope}</div>'
             f'{stats_html(stats)}</div></header>')
     brand_block = brand_html(c) or f'<div class="brand">{e(survey)}</div>'
-    crumb_parts = []
-    for j, x in enumerate(crumbs):
-        crumb_parts.append(f"<b>{e(x)}</b>" if j == len(crumbs) - 1 else f"<span>{e(x)}</span>")
-    crumbs_html = '<span class="sep">/</span>'.join(crumb_parts)
+    # Top bar: brand on the left, Download PDF on the right. Survey details live in
+    # the hero and the date in the footer, so they are not repeated here.
     appbar = (f'<div class="appbar wrap screen-only"><div class="inner">{brand_block}'
-              f'<div class="crumbs">{crumbs_html}</div>'
-              f'<div class="bar-right"><span class="stamp num">Generated {e(generated)}</span>{pdf_menu(c)}</div>'
-              '</div></div>')
+              f'<div class="bar-right">{pdf_menu(c)}</div></div></div>')
     conf_html = '<span class="conf-label">Confidential</span>' if brand.get("confidential") else ""
     q_html = f'<p class="meta">You asked: &ldquo;{e(question)}&rdquo;</p>' if is_for and question else ""
     n_resp = f"{meta['n_analysed']:,} responses"
