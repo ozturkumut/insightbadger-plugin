@@ -1,91 +1,118 @@
+<p align="center"><img src="assets/logo.png" width="120" alt="Insight Badger logo"></p>
+
 # Insight Badger
 
-Survey-specialised data insights for non-technical professionals. Drop a survey response CSV from any platform — Qualtrics, SurveyMonkey, Google Forms, Typeform, Microsoft Forms, custom — and get meaningful, actionable analysis. No spreadsheet formulas, no SPSS, no coding.
+Survey insights for people who don't analyse surveys for a living. Drop a survey export from Qualtrics, SurveyMonkey,
+Google Forms, Typeform, Microsoft Forms, SPSS or any CSV/XLSX, and get a plain-language, storytelling report: what
+drives your score, who is unhappy, what people say in their own words, and what to do next.
 
-## What it does
-
-Insight Badger reads your survey export, automatically classifies each column by question type (Likert, NPS, single-choice, multi-select, open-text, demographic), reconstructs matrix and multi-select questions, and applies the right method per type. Results are presented in plain language with a polished HTML report.
+No spreadsheet formulas, no SPSS, no coding.
 
 ## Skills
 
-### `/dig-deep` — Autonomous Survey Analysis
+### `/dig-deep`: explore a survey
 
-**No questions asked.** Hand over a survey CSV and Insight Badger explores it autonomously:
+Hand over a file and Insight Badger works out the rest: the questionnaire structure, the KPI, what drives it, which
+groups differ, the customer mindsets in your data and the themes in open comments.
 
-- Detects question types per column (Likert 5/7, NPS 0–10, CSAT, single-choice, multi-select, open-text, numeric, demographic, datetime)
-- Reconstructs matrix questions (`Q3_1…Q3_n`) and multi-select batteries (`Q5_optA…optN`)
-- Computes the right metric per type — top-2-box / bottom-2-box / net-agree for Likert, NPS score with promoter/passive/detractor split, response distribution for single-choice
-- Identifies a likely KPI question (NPS, recommend, overall satisfaction) and runs driver analysis
-- Builds attitudinal segments from Likert items and names them as personas
-- Themes open-text responses with exemplar quotes per theme
-- Cross-tabs the KPI by detected demographics and flags significant gaps
-- Delivers 3–5 key takeaways and recommended follow-up questions
+Try: *"dig deep into survey.csv"*, *"what's interesting in these responses?"*
 
-**Trigger phrases**: "dig deep", "analyse this survey", "what's interesting in this survey", "explore this survey", "find insights"
+### `/dig-for`: answer one question
 
-### `/dig-for` — Guided Survey Investigation
+You have a question; Insight Badger asks one or two clarifying questions, then delivers a focused brief that leads
+with the answer.
 
-**You have a question — Insight Badger sharpens it and answers it.** When you want to investigate a specific aspect of the survey, this skill asks a few survey-aware clarifying questions and runs a focused analysis.
+Try: *"what's driving our NPS?"*, *"why are small customers less happy?"*, *"compare enterprise vs SMB on onboarding"*,
+*"what do detractors complain about?"*
 
-Common patterns it handles:
+## The report
 
-- "What's driving our NPS?" → driver analysis on Likert items predicting NPS
-- "Compare power users vs. light users" → cross-tabs + significance tests
-- "Why did satisfaction drop in Q3?" → trend + driver decomposition (longitudinal surveys)
-- "How do our enterprise customers feel about pricing?" → scoped subgroup analysis
-- "What do people complain about in open-text?" → themed open-text analysis with quotes
+Every run produces a single self-contained HTML file that works offline:
 
-**Trigger phrases**: "dig for", "what's driving NPS", "compare segments", "why did X change", "break down Y by Z"
+- **Header** with the headline finding and the key figures (score, likely range, change since last wave, completion).
+- **Overview / Answer** tab: the answer in two or three sentences, a story map of the chapters, recommended actions
+  and the next questions to dig into.
+- **Chapter tabs**: drivers (importance vs performance with "fix first" and "protect" zones), group gaps with likely
+  ranges, two-group item comparisons, customer mindsets as personas, open-text themes with quotes.
+- **Reference tabs**: every question as a card, data quality and plain-language methods.
+- **Colour means something**: brand teal for strengths, clay for problems, ochre for "watch", slate for comparisons.
 
-## Output
+### PDF, branded or unbranded
 
-Both skills produce:
+The **Download PDF** button at the top right offers two versions:
 
-1. **Conversation summary** — a concise plain-language answer right in the chat, leading with the headline finding (NPS score, top driver, biggest segment gap).
-2. **HTML report** — a polished, self-contained file with interactive charts and detailed findings, saved to your output folder.
+- **Insight Badger branded**: logo on the cover, credit in the footer.
+- **Unbranded**: no logo or product name, ready to send as your own.
 
-The HTML report is organised into five tabs:
+Either version prints with a cover page, one chapter per page and page numbers. You can also ask for a PDF in chat
+("…and give me an unbranded PDF"); the skill saves it next to the report using Chrome, Edge or WeasyPrint.
 
-- **Insights** — KPI summary, headline findings, driver chart, top segment differences, key takeaways
-- **Questions** — one card per question with the right visualisation per type (Likert bar with top-2-box callout, donut for single-choice, NPS gauge, themed quote cards for open-text)
-- **Segments** — attitudinal segments with persona profiles and demographic composition
-- **Data** — health check per column (traffic-light rating), skip-logic interpretation, response quality flags (straight-lining, speeders, completion rate)
-- **Info** — report metadata, column reference (codebook), techniques applied, raw data sample
+### Your own brand
 
-## Survey-Aware Methods
+Put a `.insight-badger.json` file in your project folder (or any parent folder):
 
-Insight Badger draws from a survey-research toolkit:
+```json
+{
+  "brand": "custom",
+  "name": "Acme Research",
+  "logo": "brand/acme-logo.png",
+  "primary": "#1F5FAD",
+  "paper": "Letter",
+  "confidential": true
+}
+```
 
-- **Question-type detection** — header patterns, value ranges, response text matching
-- **Matrix and multi-select reconstruction** — group `Q3_1…Q3_n` as one item battery, `Q5_optA…optN` as one multi-response question
-- **Codebook ingestion** — optional second file (CSV/JSON) mapping column → question text + response options; inferred from headers if absent
-- **Likert metrics** — top-2-box, bottom-2-box, net-agree, mean score (with caveats), distribution shape
-- **NPS / CSAT / CES** — promoter/passive/detractor split, NPS score, CSAT %, with confidence intervals
-- **Construct reliability** — Cronbach's alpha for matrix question batteries
-- **Driver analysis** — relative weights / dominance analysis predicting KPI from Likert composites
-- **Attitudinal segmentation** — K-Means / GMM on Likert items with auto-named personas
-- **Open-text NLP** — TF-IDF + clustering for themes, VADER sentiment, exemplar quotes per theme
-- **Cross-tabs** — KPI by demographic with chi-squared / z-test for proportions
-- **Skip-logic awareness** — distinguishes "not asked" from "didn't answer"
-- **Response quality flags** — straight-lining detection, speeder/laggard flagging, completion rate
-- **Significance testing** — chi-squared, z-test for proportions, t-test, ANOVA — with effect sizes
+`brand` can be `insight-badger` (default), `none` or `custom`. With `custom`, the report uses your name, logo and
+colour, and the footer reads "Prepared by Acme Research".
 
-## Typical Workflow
+## What it handles
 
-**Option A — Explore freely:**
-Drop a survey CSV and say "dig deep" or "analyse this survey". Insight Badger profiles the questionnaire, identifies the KPI, runs drivers and segments, themes the open-text, and delivers a full HTML report.
-
-**Option B — Investigate a question:**
-Say "dig for what's driving our NPS" or "compare enterprise vs. SMB on satisfaction" along with your CSV. Insight Badger asks one or two clarifying questions, then runs a focused analysis.
-
-**Optional codebook:**
-For sharper results, provide a codebook alongside your CSV — a JSON or CSV file mapping each column to its question text and response options. Insight Badger works without one (inferring from headers and values), but a codebook eliminates ambiguity.
+- **Exports from every major platform**: Qualtrics' three header rows, SurveyMonkey's two header rows, Google Forms
+  grids and checkbox answers, XLSX, SPSS `.sav` (with `pyreadstat`), and an optional codebook.
+- **Question types**: NPS, agree/satisfied/frequency/quality/likelihood scales (5- or 7-point, text or numbers),
+  CSAT, CES, other numeric ratings, single choice, multi-select, open text, numbers, demographics.
+- **"Don't know" and "Not applicable"** are left out of percentages instead of being counted as answers.
+- **Data quality**: completion, speeders (under a third of the median time), straight-liners, questions skipped by
+  survey routing, drop-off, all reported in plain words.
+- **Sound statistics**: correct NPS confidence ranges, survey weights, group gaps tested and adjusted for the number
+  of comparisons, groups under 30 people flagged and never called significant.
+- **Drivers** with relative-weights analysis; **mindsets** with k-means on rating answers; **open text** themed by
+  Claude in any language, with counts and sentiment computed by the engine.
+- **Privacy**: names, emails, phone numbers and IP addresses never appear in the report, and are removed from quotes.
 
 ## Requirements
 
-- Python 3.x with: pandas, numpy, scikit-learn, scipy, matplotlib, seaborn, vaderSentiment (for open-text sentiment)
-- Survey response CSV from any platform (Qualtrics, SurveyMonkey, Google Forms, Typeform, Microsoft Forms, custom exports)
+Python 3.9+ with `pandas`, `numpy`, `scipy`, `scikit-learn` and `openpyxl`:
 
-## Setup
+```bash
+pip install -r requirements.txt
+```
 
-No configuration needed. Install the plugin and start using `/dig-deep` or `/dig-for`.
+Optional: `pyreadstat` for SPSS files, `weasyprint` for PDF export when no Chrome or Edge is installed.
+
+## How it works
+
+The skills drive a tested analysis engine in `scripts/`:
+
+```bash
+python3 scripts/ib.py profile survey.csv          # question types, batteries, KPI and group candidates
+python3 scripts/ib.py analyze survey.csv --compare Q3
+python3 scripts/ib.py themes --codes codes.json   # after Claude codes the comments
+python3 scripts/ib.py render --narrative narrative.json [--pdf] [--brand none]
+```
+
+The engine computes every number; Claude reviews the profile, codes the comments and writes the narrative
+(`docs/narrative.md`), so the words can never drift from the data. Methods are described in `docs/methods.md`.
+
+## Development
+
+```bash
+pip install -r requirements.txt pytest
+python3 tests/make_fixtures.py   # synthetic Qualtrics, SurveyMonkey and Google Forms exports
+python3 -m pytest
+./tools/build.sh                 # builds dist/insight-badger.zip
+```
+
+## Licence
+
+Apache 2.0

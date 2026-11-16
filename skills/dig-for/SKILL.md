@@ -1,128 +1,118 @@
 ---
 name: dig-for
 description: >
-  Perform guided survey analysis when the user has a direction but needs help articulating it.
-  Use when the user says "dig for", "what's driving NPS", "why is satisfaction down",
-  "compare power users vs light users", "compare these segments", "break down Y by Z",
-  "what do people complain about", "why did X change", or has a survey CSV and a rough question.
-  Also triggers on "run dig-for" or "/dig-for".
+  Perform guided survey analysis when the user has a direction but needs help articulating it, and deliver a focused
+  one-question HTML report with optional PDF. Use when the user says "dig for", "what's driving NPS", "why is
+  satisfaction down", "compare power users vs light users", "compare these segments", "break down Y by Z",
+  "what do people complain about", "why did X change", or has a survey export and a rough question. Also triggers on
+  "run dig-for" or "/dig-for".
+argument-hint: "[question] [survey file]"
+allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py *), Bash(python ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py *)
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
-# Dig For — Guided Survey Investigation
+# Dig For: guided survey investigation
 
-The user has a survey-response CSV (any platform) and a rough idea of what they want to understand. Help them sharpen the question, then deliver a focused, survey-aware analysis.
+The user has a survey export and a rough question. Sharpen the question, run a
+focused analysis, and deliver a one-question brief: the answer first, then the
+evidence, then how sure we are.
 
-**Hard assumption: the input is a survey.** Treat columns as questions, rows as respondents. Use the reference file `references/analysis-techniques.md` throughout.
+**All numbers come from `ib.py`.** Do not compute statistics yourself or write
+your own analysis scripts. Your job is to clarify the question, pick the
+comparison, code the relevant comments and write the narrative.
 
-## Execution Flow
+`IB` below means `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/ib.py` (use `python`
+if `python3` is not found). Method details: `${CLAUDE_PLUGIN_ROOT}/docs/methods.md`.
+Narrative format: `${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`.
 
-### 1. Quick Survey Profile
+## 1. Profile
 
-Read the CSV and run question-type detection (§ 1 of the reference) and question grouping (§ 2). You need to know what KPI candidates, demographic candidates, and item batteries exist before you can ask the user a useful clarifying question.
+```bash
+IB profile "<survey file>" [--codebook "<codebook>"]
+```
 
-If a codebook file accompanies the CSV, ingest it (§ 3).
+If packages are missing: `pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt`.
+Note the KPI candidates, demographics, batteries and open-text questions. Fix
+wrong types with `--types types.json`.
 
-Don't profile or report yet. Just build the internal map of `column → question_type → group`.
+## 2. Clarify (AskUserQuestion)
 
-### 2. Clarify Intent
+Ask only what the user's message leaves open, 1–3 questions, offering the
+columns you found:
 
-Use **AskUserQuestion** to clarify. Adapt questions to what the user has already said — never re-ask what's obvious.
+- **KPI**: which question measures success (offer the NPS / satisfaction candidates).
+- **Comparison**: which groups to compare (offer demographics with their values),
+  and which two groups matter most if there are many.
+- **Scope**: everyone, or a subset (one wave, one plan, completed responses only).
+- **Time**: compare waves, if a wave or date column exists.
 
-Survey-specific clarifying angles (ask 1–3, not all):
+If the message already answers these ("what's driving NPS for enterprise
+customers"), skip the questions.
 
-- **KPI**: "Which question is your KPI for this analysis?" Offer detected NPS / CSAT / overall-satisfaction / recommend columns. If none, offer the top Likert items.
-- **Comparison group**: "Which group should I compare?" Offer detected demographics (region, segment, role, company size, etc.) and any single-choice questions with low cardinality.
-- **Construct**: "Which set of questions defines [the topic the user mentioned]?" Offer detected item batteries by stem.
-- **Time**: "Should I compare across response waves or look at the trend over time?" Offer the timestamp column or detected wave column if present.
-- **Scope filter**: "Should I focus on all respondents or a subset (e.g. only completed responses, only enterprise customers, only the last wave)?"
-- **Depth**: "Quick snapshot or thorough deep-dive?"
+## 3. Analyze
 
-If the user's original message already answers some of these (e.g. "what's driving NPS for enterprise customers"), skip the answered ones and only ask what's still ambiguous.
+Map the question to options:
 
-### 3. Plan the Analysis
-
-Based on the answers, silently pick survey-aware techniques. Use the reference for method details. Typical mappings:
-
-| User intent | Techniques |
+| Question | Options |
 |---|---|
-| "What's driving X?" (X is KPI) | Driver analysis on Likert items (§ 11) + matrix-battery composites (§ 12) |
-| "Compare segment A vs B" | Cross-tab + z-test for proportions (top-2-box) + chi-squared on distributions (§ 14) |
-| "What predicts X?" | Driver analysis + correlation + Random Forest feature importance |
-| "Break down X by Y" | Group-by aggregation per Y, distribution comparison, significance flags |
-| "Why did X drop?" | Trend over waves + driver decomposition + check for compositional shifts |
-| "What's our score on X?" | Top-2-box / NPS / CSAT calculation + confidence interval + sample size |
-| "What do people complain about?" | Open-text themes (§ 9) + sentiment + exemplar quotes + topic-by-segment cross-tab |
-| "Are these ratings normal?" | Distribution + percentile context + benchmark comparison if industry data referenced |
-| "Find segments / personas" | Attitudinal clustering on Likert items (§ 13) with persona naming |
+| What's driving X? | `--kpi X` (drivers run automatically) |
+| Compare A vs B / break down X by Y | `--compare Y --pair "A,B"` |
+| Why did X change? | `--wave COL --compare <demographics>` |
+| How do <subgroup> feel about X? | `--filter "COL=value"` |
+| What do people complain about? | read the open text after analyze |
+| Find personas | `--segments` |
 
-### 4. Execute
+```bash
+IB analyze "<survey file>" --mode for --question "<the user's question>" [options]
+```
 
-Run the chosen techniques in Python (pandas, numpy, scikit-learn, scipy, vaderSentiment).
+Read the digest. Only `real` and `probable` gaps are findings; `small-base`
+groups need a caution.
 
-For every finding:
-- State the fact in one plain sentence.
-- Give the supporting number or chart.
-- Explain why it matters to the user's question.
+## 4. Code the relevant comments
 
-Never use ordinal scales as if they were continuous in user-facing text — always lead with top-2-box / NPS / proportions, and use means only as a secondary readout.
+If comments help answer the question, read `insight-badger/<file>/texts.json`.
+Each answer carries the person's NPS group and compared-group values, so you
+can focus on the groups in question. Write `codes.json` (format in methods.md),
+then:
 
-### 5. Scoped Quality Check
+```bash
+IB themes --codes insight-badger/<file>/codes.json --results insight-badger/<file>/results.json
+```
 
-Only surface quality issues that affect the user's specific question. Examples:
+## 5. Write the narrative
 
-- They ask about NPS drivers but 30 % of NPS values are missing → critical, mention it.
-- They ask about enterprise customers but the segment column is missing for 25 % of respondents → mention it.
-- A matrix battery used as a composite has Cronbach's alpha < 0.6 → mention it (the construct may not hold together).
-- An unrelated column has issues → ignore it.
+Write `insight-badger/<file>/narrative.json` following
+`${CLAUDE_PLUGIN_ROOT}/docs/narrative.md`. For dig-for:
 
-Skip-logic missingness should be interpreted as legitimate, not flagged.
+- **question**: the user's question, word for word; **scope**: 2–3 chips.
+- **title**: the answer, as a sentence.
+- **answer**: 2–3 sentences, leading with the headline number.
+- **stats**: 3–4 tiles that answer the question (the gap, the biggest reason, the group sizes).
+- **reasons**: the 1–3 main reasons, each with its number; **not_cause**: what is not driving it.
+- **chapters**: 1–3, usually Evidence (`groups`, `pair` or `drivers`) and In their words (`quotes`).
+- **caveats**: what the conclusion rests on (`solid`) and what to watch (`watch`).
+- **actions** and **next_questions**.
 
-### 6. Synthesise
+## 6. Render
 
-End with:
+```bash
+IB render --narrative insight-badger/<file>/narrative.json --results insight-badger/<file>/results.json
+```
 
-- **Direct answer**: address the user's question in 2–3 sentences, as if briefing a colleague. Lead with the headline number.
-- **Supporting evidence**: 3–5 most important data points or charts that back up the answer.
-- **Caveats**: anything that weakens the conclusion (small subgroup sample, low alpha, high missingness, confounding demographic).
-- **Next steps**: 1–2 follow-up questions worth exploring (e.g. "Worth running `/dig-deep` on this same file to see the full attitudinal segments?").
+Fix every `Warning:` line and render again. `--pdf` also saves a PDF;
+`--brand none` makes it unbranded.
 
-## Output Rules
+## 7. Reply
 
-1. **Two outputs**: concise answer in the conversation AND a focused HTML report saved to the user's output folder.
+Lead with the direct answer and its number, like briefing a colleague. One
+short paragraph of supporting evidence, one line of caveats, then the report
+path and a mention of the **Download PDF** button (branded or unbranded). No
+emoji, no tables.
 
-2. **HTML report**: Use the tabbed template from `references/analysis-techniques.md` § 16. Tabs are scoped to the question:
-   - **Insights** (default): direct answer card, supporting charts, findings, follow-up suggestions. Only include charts relevant to the user's question — no filler.
-   - **Questions**: only the questions touched by this analysis (the KPI, the drivers, the items being compared). Skip the tab entirely if the analysis touches only one question.
-   - **Segments**: only included if the user's question involves segmentation or attitudinal clustering.
-   - **Data**: scoped quality information — only the quality issues affecting the user's specific question.
-   - **Info**: report metadata, column reference (limited to columns used), techniques applied, raw data sample.
+## Guardrails
 
-3. **Branding**: brand colours `#3F8585` primary, `#FEFBF1` background, `#39403A` dark. Follow the chart palette in the template reference.
-
-4. **Conversation summary**: lead with the direct answer (e.g. "Your NPS is 42, with onboarding clarity as the strongest driver"). Keep it to 2–3 short paragraphs. Link the report for details.
-
-5. **Language**: non-technical. Avoid "ordinal", "MAR", "eta-squared", "Cronbach's alpha", "p-value" in user-facing text. Translate: "statistically significant" → "unlikely to be a coincidence"; "Cronbach's alpha 0.82" → "the questions in this set hang together well — they're measuring one thing"; "p < 0.05" → "this gap is real, not noise".
-
-6. **Charts**: focused on the user's question. Each chart gets a plain-language title and a one-sentence caption. No emoji anywhere.
-
-## Conversation Style
-
-Be warm, curious, and collaborative — like a smart survey analyst sitting next to the user. Avoid:
-- Lecturing about methodology (Cohen's d, alpha, eta-squared) unprompted
-- Dumping tables of raw numbers
-- Excessive hedge words ("it seems like maybe perhaps")
-
-Do:
-- Give confident answers when the data supports them
-- Be upfront about uncertainty (small subgroup, low alpha, missing data)
-- Suggest what to look at next
-
-## Python Environment
-
-Use pandas, numpy, scikit-learn, scipy.stats, matplotlib/seaborn, vaderSentiment. All are available via pip. For the HTML report, generate Chart.js configs and embed them in the HTML.
-
-## Hard Specialisation
-
-This skill assumes the input is a survey. If the file genuinely doesn't look like a survey, tell the user explicitly and offer to run generic analysis instead.
+- Never report a gap marked `chance` or `small-base` as a finding.
+- Never quote personal details.
+- Never invent benchmarks.
