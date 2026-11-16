@@ -73,8 +73,12 @@ def html_to_pdf(html_path: str, out: str | None = None, brand_mode: str = "insig
             pass
         chrome = _find_chrome()
         if chrome:
-            cmd = [chrome, "--headless=new", "--disable-gpu", "--no-sandbox", "--no-pdf-header-footer",
+            cmd = [chrome, "--headless=new", "--disable-gpu", "--no-pdf-header-footer",
                    f"--print-to-pdf={os.path.abspath(out)}", "file://" + os.path.abspath(src)]
+            # Chrome refuses to start as root (containers) unless its sandbox is off.
+            # Never disable it for a normal user account.
+            if hasattr(os, "geteuid") and os.geteuid() == 0:
+                cmd.insert(1, "--no-sandbox")
             res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
             if os.path.exists(out) and os.path.getsize(out) > 0:
                 return out, f"Wrote PDF {out}"
