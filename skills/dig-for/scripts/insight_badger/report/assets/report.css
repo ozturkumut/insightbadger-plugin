@@ -113,7 +113,7 @@ em.hl-good { font-style: normal; color: var(--teal-deep); font-weight: 600; }
 .tabbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
 .tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
-.tab { flex: none; display: flex; align-items: center; gap: 8px; padding: 14px 14px 12px; font-size: 14px; font-weight: 500; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+.tab { flex: none; display: flex; align-items: center; gap: 8px; padding: 14px 14px 12px; font: 500 14px var(--font-body); color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent; white-space: nowrap; cursor: pointer; }
 .tab:hover { color: var(--ink); }
 .tab .no { font: 600 11px var(--font-display); width: 19px; height: 19px; border-radius: 5px; display: grid; place-items: center; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
 .tab .ct { font-size: 11.5px; font-weight: 600; color: var(--muted); background: var(--bg); border-radius: 999px; padding: 0 7px; border: 1px solid var(--line); }
@@ -154,7 +154,8 @@ em.hl-good { font-style: normal; color: var(--teal-deep); font-weight: 600; }
 
 /* Story map and actions */
 .storymap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.story { --c: var(--slate); --cp: var(--slate-pale); --cd: var(--slate-deep); display: grid; gap: 6px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; text-decoration: none; color: var(--ink); transition: border-color .15s; }
+.story { --c: var(--slate); --cp: var(--slate-pale); --cd: var(--slate-deep); display: grid; gap: 6px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; text-decoration: none; color: var(--ink); transition: border-color .15s; cursor: pointer; }
+.story:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 .story:hover { border-color: var(--c); }
 .tone-problem { --c: var(--clay); --cp: var(--clay-pale); --cd: var(--clay-deep); }
 .tone-strength { --c: var(--teal); --cp: var(--teal-pale); --cd: var(--teal-deep); }
@@ -313,9 +314,9 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
 
 /* Pager and footer */
 .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; border-top: 1px solid var(--line); padding-top: 18px; }
-.pager a { display: grid; gap: 2px; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
-.pager a:hover { border-color: var(--teal); }
-.pager a.nx { text-align: right; grid-column: 2; }
+.pager button { display: grid; gap: 2px; text-align: left; font: inherit; cursor: pointer; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+.pager button:hover { border-color: var(--teal); }
+.pager button.nx { text-align: right; grid-column: 2; }
 .pager span { font-size: 12px; color: var(--muted); }
 .pager b { font-family: var(--font-display); font-weight: 600; font-size: 15px; }
 .foot { border-top: 1px solid var(--line); padding-block: 22px 32px; background: var(--surface); }
@@ -323,6 +324,18 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
 .foot .brand { font-size: 14px; }
 .foot .mark { width: 30px; height: 30px; }
 .cover, .print-only { display: none; }
+
+/* Tabs need scripts. Without them (some app previews), every section shows as
+   one long page and the controls that need scripts are hidden. */
+.js [role="tabpanel"]:not(.active) { display: none; }
+.no-js .tabbar, .no-js .pager, .no-js .pdf, .no-js .story .go { display: none !important; }
+.no-js [role="tabpanel"] + [role="tabpanel"] { border-top: 1px solid var(--line); }
+.notice-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(57,64,58,.42); display: grid; place-items: center; padding: 16px; }
+.notice { background: var(--surface); border-radius: 14px; max-width: 460px; padding: 20px 22px; display: grid; gap: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.22); }
+.notice h2 { font-size: 18px; }
+.notice p { font-size: 14px; }
+.notice code { font-size: 12.5px; background: var(--teal-wash); padding: 1px 6px; border-radius: 4px; }
+.notice button { justify-self: end; font: 600 13.5px var(--font-body); color: var(--surface); background: var(--teal-deep); border: 0; border-radius: 9px; padding: 8px 14px; cursor: pointer; }
 .nologo .mark, .nologo .thumb .lg { display: none; }
 
 @media (max-width: 900px) {
@@ -345,7 +358,7 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
   .theme { grid-template-columns: 112px minmax(0, 1fr) 36px; font-size: 12px; }
   .hbar { grid-template-columns: 110px minmax(0, 1fr) 40px; font-size: 12px; }
   .pager { grid-template-columns: minmax(0, 1fr); }
-  .pager a.nx { grid-column: 1; }
+  .pager button.nx { grid-column: 1; }
 }
 
 /* ── Print / PDF ── */
@@ -368,7 +381,8 @@ ul.methods { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 
   .cover .conf-label { position: absolute; top: 10mm; right: 0; font-size: 9pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--clay-deep); }
   .print-stats { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin-bottom: 6mm; }
   .print-stats .stat { border: 1px solid var(--line) !important; border-radius: 8px; }
-  [role="tabpanel"][hidden] { display: block !important; }
+  [role="tabpanel"], .js [role="tabpanel"]:not(.active) { display: block !important; }
+  .notice-backdrop { display: none !important; }
   [role="tabpanel"] { break-before: page; padding-block: 0; }
   [role="tabpanel"]:first-of-type { break-before: auto; }
   .figure, .quote, .persona, .story, .reason, .action, tr, .lk-row, .theme { break-inside: avoid; }

@@ -117,9 +117,23 @@ the README).
 ## 6. Reply
 
 2–3 short paragraphs: the KPI and the most actionable finding, the biggest
-gap or segment, and what to do next. Give the report path. Mention that the
-report's **Download PDF** button offers branded and unbranded versions. Do not
-paste tables. No emoji.
+gap or segment, and what to do next. Give the report path and suggest opening
+it in a web browser (Chrome, Edge, Safari, Firefox): app previews may show it
+as one long page and cannot print. Mention that the report's **Download PDF**
+button offers branded and unbranded versions. Do not paste tables. No emoji.
+
+## PDF requests
+
+When the user asks for a PDF (for example "save this report as a PDF", or
+"unbranded"), run:
+
+```bash
+IB pdf <report.html> [--brand none]
+```
+
+It uses Chrome, Edge or WeasyPrint if one is available. If it reports that no
+PDF engine is available (common in sandboxes), tell the user to open the
+report in their browser and use its **Download PDF** button.
 
 ## Guardrails
 

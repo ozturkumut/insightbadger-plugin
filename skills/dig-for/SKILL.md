@@ -122,8 +122,22 @@ Fix every `Warning:` line and render again. `--pdf` also saves a PDF;
 
 Lead with the direct answer and its number, like briefing a colleague. One
 short paragraph of supporting evidence, one line of caveats, then the report
-path and a mention of the **Download PDF** button (branded or unbranded). No
-emoji, no tables.
+path, a suggestion to open it in a web browser (app previews may show it as
+one long page and cannot print), and a mention of the **Download PDF** button
+(branded or unbranded). No emoji, no tables.
+
+## PDF requests
+
+When the user asks for a PDF (for example "save this report as a PDF", or
+"unbranded"), run:
+
+```bash
+IB pdf <report.html> [--brand none]
+```
+
+It uses Chrome, Edge or WeasyPrint if one is available. If it reports that no
+PDF engine is available (common in sandboxes), tell the user to open the
+report in their browser and use its **Download PDF** button.
 
 ## Guardrails
 

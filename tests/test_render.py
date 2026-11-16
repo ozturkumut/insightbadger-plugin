@@ -89,3 +89,17 @@ def test_engine_copies_in_sync():
     tool = os.path.join(HERE, "..", "tools", "sync_engine.py")
     res = subprocess.run([sys.executable, tool, "--check"], capture_output=True, text=True)
     assert res.returncode == 0, res.stdout
+
+
+def test_navigation_works_in_app_previews(q_results):
+    """Inside sandboxed previews a '#section' link replaces the page with a blank
+    one, so navigation must never use page links, and without scripts every
+    section must be visible."""
+    r = _coded(q_results)
+    narrative = json.load(open(os.path.join(FIX, "narrative_deep.json")))
+    html, _ = render_report(r, narrative, load_brand("insight-badger"))
+    assert 'href="#' not in html
+    assert '<html lang="en" class="no-js">' in html and "className='js'" in html
+    assert 'role="tabpanel" hidden' not in html and " hidden>" not in html.split('class="pdf-menu"')[0]
+    assert '.js [role="tabpanel"]:not(.active) { display: none; }' in html
+    assert "This viewer can" in html  # explains a blocked print window

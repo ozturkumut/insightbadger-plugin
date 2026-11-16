@@ -445,8 +445,10 @@ def _actions(n: dict) -> str:
 def _pager(prev, nxt) -> str:
     if not prev and not nxt:
         return ""
-    p = f'<a href="#{prev[0]}"><span>Previous</span><b>← {e(prev[1])}</b></a>' if prev else ""
-    n_ = f'<a class="nx" href="#{nxt[0]}"><span>Next</span><b>{e(nxt[1])} →</b></a>' if nxt else ""
+    p = (f'<button type="button" data-go="{prev[0]}"><span>Previous</span><b>← {e(prev[1])}</b></button>'
+         if prev else "")
+    n_ = (f'<button type="button" class="nx" data-go="{nxt[0]}"><span>Next</span><b>{e(nxt[1])} →</b></button>'
+          if nxt else "")
     return f'<div class="pager">{p}{n_}</div>'
 
 
@@ -485,7 +487,8 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
                 name_html += '<span class="flag" title="Contains something to fix"></span>'
             if chp.get("count") is not None:
                 name_html += f'<span class="ct num">{e(chp["count"])}</span>'
-            tab_html.append(f'<a class="{cls}" role="tab" href="#{tid}" data-tab="{tid}">{extra}{name_html}</a>')
+            tab_html.append(f'<button type="button" class="{cls}" role="tab" aria-controls="p-{tid}" '
+                            f'data-tab="{tid}">{extra}{name_html}</button>')
         else:
             label = e(name)
             if tid == "questions":
@@ -494,7 +497,8 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
                 w = sum(1 for x in (n.get("caveats") or results.get("caveats") or []) if x.get("level") == "watch")
                 if w:
                     label += f'<span class="ct watch num">{w}</span>'
-            tab_html.append(f'<a class="{cls}" role="tab" href="#{tid}" data-tab="{tid}">{label}</a>')
+            tab_html.append(f'<button type="button" class="{cls}" role="tab" aria-controls="p-{tid}" '
+                            f'data-tab="{tid}">{label}</button>')
         if tid == first_id:
             tab_html.append('<span class="divider" aria-hidden="true"></span>')
 
@@ -527,10 +531,10 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
                 tone = chp.get("tone", "neutral")
                 tag_html = f'<span class="tag">{e(chp.get("tag"))}</span>' if chp.get("tag") else "<span></span>"
                 cid = chp["_id"]
-                cards.append(f'<a class="story tone-{tone}" href="#{cid}"><div class="top">'
+                cards.append(f'<div class="story tone-{tone}" data-go="{cid}" role="link" tabindex="0"><div class="top">'
                              f'{tag_html}'
                              f'<span class="ch">Chapter {i}</span></div><h3>{e(plain(chp.get("title")))}</h3>'
-                             f'<p>{rich(chp.get("summary", ""))}</p><span class="go">Open {e(chp.get("tab") or "chapter")} →</span></a>')
+                             f'<p>{rich(chp.get("summary", ""))}</p><span class="go">Open {e(chp.get("tab") or "chapter")} →</span></div>')
             first.append(f'<div class="head"><span class="kicker">The story in {len(chapters)} chapter{"s" if len(chapters) != 1 else ""}</span></div>'
                          f'<div class="storymap">{"".join(cards)}</div>')
     first.append(_actions(n))
@@ -615,7 +619,8 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
             f'<span>{credit_html}{e(generated)} · {e(os.path.basename(meta["file"]))}{filt}</span></div></footer>')
 
     panel_html = "".join(
-        f'<section class="panel wrap" id="p-{tid}" role="tabpanel"{"" if j == 0 else " hidden"}><div class="inner">{body}</div></section>'
+        f'<section class="panel wrap{" active" if j == 0 else ""}" id="p-{tid}" role="tabpanel" '
+        f'data-title="{e(dict((t[0], t[1]) for t in tabs).get(tid, ""))}"><div class="inner">{body}</div></section>'
         for j, (tid, body) in enumerate(panels))
     css = _read("report.css").replace("__PAPER__", "letter" if brand.get("paper", "A4").lower() == "letter" else "A4")
     color_vars = "".join(f"{k}:{v};" for k, v in (brand.get("colors") or {}).items())
@@ -625,7 +630,8 @@ def render_report(results: dict, narrative: dict, brand: dict) -> tuple[str, lis
     file_title = f"{survey} - {'focused question' if is_for else 'full exploration'} - {generated}"
     body_cls = ("for-report" if is_for else "deep-report") + (" unbranded" if brand["mode"] == "none" else "") + \
                ("" if brand.get("logo") else " nologo")
-    html = (f'<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+    html = (f'<!DOCTYPE html><html lang="en" class="no-js"><head><meta charset="utf-8">'
+            "<script>document.documentElement.className='js';</script>"
             f'<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
             f'<title>{e(title_txt)}</title><meta name="generator" content="Insight Badger">'
             f'<style>{css}\n{root}</style></head>'
